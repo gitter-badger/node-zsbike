@@ -1,8 +1,4 @@
 {
 	"bike_api_url" : "",
-	"avos" : {
-		"url" : "https://leancloud.cn/1.1/",
-		"id" : "",
-		"key" : ""
-	}
+	"db": "",
 }
