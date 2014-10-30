@@ -2,16 +2,15 @@
 * @Author: weidong
 * @Date:   2014-10-30 23:20:00
 * @Last Modified by:   weidong
-* @Last Modified time: 2014-10-30 23:42:41
+* @Last Modified time: 2014-10-31 00:16:52
 */
 var mongoose = require('mongoose');
 var config = require('./config');
 
-mongoose.connect(config.db, function (err) {
-  if (err) {
-    console.error('connect to %s error: ', config.db, err.message);
-    process.exit(1);
-  }
+var db = mongoose.createConnection(config.db); 
+
+db.on('error', function(error) {
+    console.log(error);
 });
 
 var Schema = mongoose.Schema;
@@ -26,5 +25,6 @@ var StationSchema = new Schema({
 	create_at: { type: Date, default: Date.now },
 	update_at: { type: Date, default: Date.now },
 });
-mongoose.model('Station', StationSchema);
-exports.Station = mongoose.model('Station');
+db.model('Station', StationSchema);
+exports.Station = db.model('Station');
+exports.db = db;
