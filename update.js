@@ -2,23 +2,28 @@
 * @Author: weidong
 * @Date:   2014-10-29 21:04:19
 * @Last Modified by:   weidong
-* @Last Modified time: 2014-10-30 23:55:23
+* @Last Modified time: 2014-10-31 00:18:46
 */
 var cfg = require('./config.json');
 var moment = require('moment');
 var crypto =  require('crypto');
 var url = cfg.bike_api_url;
 var request = require('request');
+var mongoose = require('mongoose');
 var models = require('./model');
 var Station = models.Station;
 console.log('开始时间',moment().format());
+var timmer = 0;
+var length = 0;
 var req = request(url,function(error,response,body){
 	if(!error&&response.statusCode==200){
 		try{
 			var data = JSON.parse(body.substr(11));
 			console.log('成功获取数据并解析',moment().format());
 			var station = data.station;
+			length = station.length;
 			for(d in data.station){
+				timmer++;
 				saveToDb(station[d]);
 			}					
 		}catch(e){
@@ -55,7 +60,7 @@ function saveToDb(data){
 			 	station = new Station();
 			}
 			else{
-				console.log('站点',data.name,'已经有数据,上次更新时间',station.updated_at,'，更新数据库记录');
+				console.log('站点',data.name,'已经有数据,上次更新时间',station.update_at,'，更新数据库记录');
 			}
 			station.name = data.name;
 			station.address = data.address;
@@ -65,7 +70,9 @@ function saveToDb(data){
 			station.availbike = data.availBike;
 			station.sid = data.id;
 			station.save();
+			station=null;
 			console.log('站点',data.name,'更新成功！');
+			if(timmer==length) models.db.close();
 		}
 	});
 }
